@@ -2,9 +2,11 @@ package com.ilnur.bookich.services;
 
 import com.ilnur.bookich.dtos.ExchangeRequestDTO;
 import com.ilnur.bookich.dtos.ExchangeResponseDTO;
+import com.ilnur.bookich.dtos.RequestStatusDTO;
 import com.ilnur.bookich.entities.Book;
 import com.ilnur.bookich.entities.ExchangeRequest;
 import com.ilnur.bookich.entities.User;
+import com.ilnur.bookich.enums.ExchangeStatus;
 import com.ilnur.bookich.mappers.ExchangeRequestMapper;
 import com.ilnur.bookich.repositories.BookRepository;
 import com.ilnur.bookich.repositories.ExchangeRequestRepository;
@@ -85,6 +87,26 @@ public class ExchangeRequestService {
         return rawRequests.stream()
                 .map(exchangeRequestMapper::toResponseDTO)
                 .toList();
+    }
+
+    public void updateExchangeStatus(Long reqId, RequestStatusDTO requestDto) {
+        ExchangeRequest request = exchangeRequestRepository.findById(reqId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No such request id")
+        );
+
+        User currentUser = userContextService.getCurrentUser();
+
+        if(!request.getReceiver().getId().equals(currentUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only Receiver Can Update the Status");
+        }
+
+        if(!request.getStatus().equals(ExchangeStatus.PENDING)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You Cannot Update Old Requests");
+        }
+
+        request.setStatus(requestDto.getStatus());
+
+        exchangeRequestRepository.save(request);
     }
 
 

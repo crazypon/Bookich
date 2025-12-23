@@ -2,7 +2,9 @@ package com.ilnur.bookich.controllers;
 
 import com.ilnur.bookich.dtos.ExchangeRequestDTO;
 import com.ilnur.bookich.dtos.ExchangeResponseDTO;
+import com.ilnur.bookich.dtos.RequestStatusDTO;
 import com.ilnur.bookich.services.ExchangeRequestService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +36,11 @@ public class ExchangeController {
         return ResponseEntity.ok(outgoing);
     }
 
+    @PutMapping("/{reqId}/status")
+    public ResponseEntity<String> changeRequestStatus(@PathVariable Long reqId,
+                                                      @Valid @RequestBody RequestStatusDTO statusDTO) {
+        exchangeRequestService.updateExchangeStatus(reqId, statusDTO);
+        return ResponseEntity.ok("Status Updated Successfully");
+    }
 
 }
