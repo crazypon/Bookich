@@ -5,6 +5,7 @@ import com.ilnur.bookich.dtos.UserLoginDTO;
 import com.ilnur.bookich.dtos.UserRegistrationDTO;
 import com.ilnur.bookich.entities.User;
 import com.ilnur.bookich.exceptions.UserAlreadyExistsException;
+import com.ilnur.bookich.mappers.UserMapper;
 import com.ilnur.bookich.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final UserMapper userMapper;
 
     public AuthResponseDTO register(UserRegistrationDTO userDTO) throws UserAlreadyExistsException {
         if(userRepository.existsByUsername(userDTO.getUsername())) {
@@ -34,13 +36,8 @@ public class AuthService {
             throw new UserAlreadyExistsException("Phone number is already in use.");
         }
 
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setDistrict(userDTO.getDistrict());
+        // mapping user using MapStruct
+        User user = userMapper.toUser(new UserRegistrationDTO());
 
         userRepository.save(user);
 

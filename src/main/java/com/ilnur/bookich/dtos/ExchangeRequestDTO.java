@@ -7,9 +7,9 @@ import lombok.Data;
 
 @Data
 public class ExchangeRequestDTO {
-
+    // eg. gift or exchange
     @NotNull(message = "Please, choose the exchange type")
-    private ExchangeType exchangeType;
+    private ExchangeType type;
 
     @NotNull(message = "Please, choose the book you are swapping")
     private Long offeredBookId;

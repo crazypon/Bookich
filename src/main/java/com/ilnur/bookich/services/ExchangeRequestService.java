@@ -48,9 +48,6 @@ public class ExchangeRequestService {
             );
         }
 
-        Book requestedBook = bookRepository.findById(dto.getRequestedBookId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Such Book to Exchange")
-        );
         Book offeredBook = bookRepository.findById(dto.getOfferedBookId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Such Book to Exchange")
         );
@@ -59,13 +56,8 @@ public class ExchangeRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the owner of offered book");
         }
 
-        ExchangeRequest request = new ExchangeRequest();
-
-        request.setType(dto.getExchangeType());
-        request.setInitiator(initiator);
-        request.setReceiver(receiver);
-        request.setRequestedBook(requestedBook);
-        request.setOfferedBook(offeredBook);
+        ExchangeRequest request = exchangeRequestMapper.toExchangeRequest(dto);
+        request.setInitiator(userContextService.getCurrentUser());
 
         exchangeRequestRepository.save(request);
 
