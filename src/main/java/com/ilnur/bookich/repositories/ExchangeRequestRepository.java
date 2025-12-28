@@ -2,6 +2,8 @@ package com.ilnur.bookich.repositories;
 
 import com.ilnur.bookich.entities.ExchangeRequest;
 import com.ilnur.bookich.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,7 +26,7 @@ public interface ExchangeRequestRepository extends JpaRepository<ExchangeRequest
         JOIN FETCH r.initiator
         WHERE r.receiver = :receiver
     """)
-    List<ExchangeRequest> getExchangeRequestsByReceiver(@Param("receiver") User receiver);
+    Page<ExchangeRequest> getExchangeRequestsByReceiver(@Param("receiver") User receiver, Pageable pageable);
 
     @Query("""
         SELECT r FROM ExchangeRequest r
@@ -33,5 +35,5 @@ public interface ExchangeRequestRepository extends JpaRepository<ExchangeRequest
         JOIN FETCH r.initiator
         WHERE r.initiator = :initiator
     """)
-    List<ExchangeRequest> getExchangeRequestsByInitiator(@Param("initiator") User initiator);
+    Page<ExchangeRequest> getExchangeRequestsByInitiator(@Param("initiator") User initiator, Pageable pageable);
 }

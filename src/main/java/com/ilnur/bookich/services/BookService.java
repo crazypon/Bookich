@@ -5,15 +5,17 @@ import com.ilnur.bookich.entities.Book;
 import com.ilnur.bookich.entities.User;
 import com.ilnur.bookich.repositories.BookRepository;
 import com.ilnur.bookich.repositories.UserRepository;
-import lombok.RequiredArgsConstructor;import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +39,8 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    public Set<Book> getLibrary() {
-        return new HashSet<>(bookRepository.findAll());
+    public Page<Book> getLibrary(Pageable pageable) {
+        return bookRepository.findAll(pageable);
     }
 
     public Book getBook(Long id) {
@@ -49,9 +51,9 @@ public class BookService {
         );
     }
 
-    public List<Book> getUsersBook() {
+    public Page<Book> getUsersBook(Pageable pageable) {
         String user = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findBooksByUsername(user);
+        return userRepository.findBooksByUsername(user, pageable);
     }
 
     public void remove(long id) {

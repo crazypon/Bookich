@@ -6,6 +6,8 @@ import com.ilnur.bookich.dtos.RequestStatusDTO;
 import com.ilnur.bookich.services.ExchangeRequestService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,14 +27,14 @@ public class ExchangeController {
     }
 
     @GetMapping("/incoming")
-    public ResponseEntity<List<ExchangeResponseDTO>> getIncomingRequests() {
-        List<ExchangeResponseDTO> incoming = exchangeRequestService.getIncoming();
+    public ResponseEntity<Page<ExchangeResponseDTO>> getIncomingRequests(Pageable pageable) {
+        Page<ExchangeResponseDTO> incoming = exchangeRequestService.getIncoming(pageable);
         return ResponseEntity.ok(incoming);
     }
 
     @GetMapping("/outgoing")
-    public ResponseEntity<List<ExchangeResponseDTO>> getOutGoingRequests() {
-        List<ExchangeResponseDTO> outgoing = exchangeRequestService.getOutgoing();
+    public ResponseEntity<Page<ExchangeResponseDTO>> getOutGoingRequests(Pageable pageable) {
+        Page<ExchangeResponseDTO> outgoing = exchangeRequestService.getOutgoing(pageable);
         return ResponseEntity.ok(outgoing);
     }
 

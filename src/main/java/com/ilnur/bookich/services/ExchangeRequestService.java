@@ -12,6 +12,8 @@ import com.ilnur.bookich.repositories.BookRepository;
 import com.ilnur.bookich.repositories.ExchangeRequestRepository;
 import com.ilnur.bookich.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,23 +72,21 @@ public class ExchangeRequestService {
     }
 
     @Transactional(readOnly = true) // this is for performance purposes
-    public List<ExchangeResponseDTO> getIncoming() {
+    public Page<ExchangeResponseDTO> getIncoming(Pageable pageable) {
         User currentUser = userContextService.getCurrentUser();
-        List<ExchangeRequest> rawRequests = exchangeRequestRepository.getExchangeRequestsByReceiver(currentUser);
+        Page<ExchangeRequest> rawRequests = exchangeRequestRepository.getExchangeRequestsByReceiver(currentUser, pageable);
 
-        return rawRequests.stream()
-                .map(exchangeRequestMapper::toResponseDTO)
-                .toList();
+        return rawRequests.map(exchangeRequestMapper::toResponseDTO);
+
     }
 
     @Transactional(readOnly = true)
-    public List<ExchangeResponseDTO> getOutgoing() {
+    public Page<ExchangeResponseDTO> getOutgoing(Pageable pageable) {
         User currentUser = userContextService.getCurrentUser();
-        List<ExchangeRequest> rawRequests = exchangeRequestRepository.getExchangeRequestsByInitiator(currentUser);
+        Page<ExchangeRequest> rawRequests = exchangeRequestRepository.getExchangeRequestsByInitiator(currentUser, pageable);
 
-        return rawRequests.stream()
-                .map(exchangeRequestMapper::toResponseDTO)
-                .toList();
+        return rawRequests
+                .map(exchangeRequestMapper::toResponseDTO);
     }
 
     public void updateExchangeStatus(Long reqId, RequestStatusDTO requestDto) {
