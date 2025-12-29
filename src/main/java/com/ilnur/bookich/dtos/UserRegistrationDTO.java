@@ -1,5 +1,6 @@
 package com.ilnur.bookich.dtos;
 
+import com.ilnur.bookich.annotations.PasswordMatches;
 import com.ilnur.bookich.enums.District;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,17 +9,25 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+@PasswordMatches // custom validation, checks if password and matchPassword are equal
 public class UserRegistrationDTO {
     @NotBlank(message = "please enter your username")
     @Size(min = 3, max = 20)
     private String username;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     // Regex: At least one letter and one number
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$",
             message = "Password must contain letters and numbers")
     private String password;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    // Regex: At least one letter and one number
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$",
+            message = "Password must contain letters and numbers")
+    private String matchPassword;
 
     @NotBlank(message = "Please, enter your first name")
     @Size(min = 3, max = 20)
