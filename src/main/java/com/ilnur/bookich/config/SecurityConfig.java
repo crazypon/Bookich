@@ -28,29 +28,59 @@ CSRF - stands for Cross Site Request Forgery
 When malicious website pretends that you are the user
  */
 
+//@Configuration
+//@EnableWebSecurity
+//@RequiredArgsConstructor
+//public class SecurityConfig {
+//
+//
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+//        http
+//                .csrf(csrf -> csrf.disable()) // we usually disable csrf for RestAPIs
+//                .cors(cors -> cors.disable())
+//                .sessionManagement(
+//                        sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                )
+//                .authorizeHttpRequests(
+//                auth -> auth
+//                        .requestMatchers("/api/auth/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+////                .addFilterBefore(new JWTTokenGeneratorFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new JWTTokenValidatorFilter(), UsernamePasswordAuthenticationFilter.class);
+////                .httpBasic(Customizer.withDefaults()); // this parameter is mandatory for basic authentication
+//
+//
+//        return http.build();
+//    }
+//}
+
+
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JWTTokenValidatorFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // we usually disable csrf for RestAPIs
-                .cors(cors -> cors.disable())
-                .sessionManagement(
-                        sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(
-                auth -> auth
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .addFilterBefore(new JWTTokenGeneratorFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidatorFilter(), UsernamePasswordAuthenticationFilter.class);
-//                .httpBasic(Customizer.withDefaults()); // this parameter is mandatory for basic authentication
-
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -38,6 +38,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final Environment env;
+    private final JwtService jwtService;
 
     public AuthResponseDTO register(UserRegistrationDTO userDTO) throws UserAlreadyExistsException {
         if(userRepository.existsByUsername(userDTO.getUsername())) {
@@ -49,34 +50,31 @@ public class AuthService {
         }
 
         // mapping user using MapStruct
-        User user = userMapper.toUser(new UserRegistrationDTO());
+        User user = userMapper.toUser(userDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userRepository.save(user);
 
-        return new AuthResponseDTO("registration-success-placeholder");
+        var jwtToken = jwtService.generateToken(user);
+
+        return new AuthResponseDTO(jwtToken);
     }
 
     public AuthResponseDTO login(UserLoginDTO userDTO) {
-        String jwt = "";
-        Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(userDTO.getUsername(),
-                userDTO.getPassword());
-        Authentication authenticationResponse = authenticationManager.authenticate(authentication);
-        if(authenticationResponse.isAuthenticated()) {
-            if (null != env) {
-                String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
-                        ApplicationConstants.JWT_DEFAULT_SECRET_KEY);
-                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-                jwt = Jwts.builder().issuer("Bookich Corp").subject("JWT Token")
-                        .claim("username", authenticationResponse.getName())
-                        .claim("authorities", authenticationResponse.getAuthorities().stream().map(
-                                GrantedAuthority::getAuthority).collect(Collectors.joining(",")))
-                        .issuedAt(new java.util.Date())
-                        .expiration(new java.util.Date((new java.util.Date()).getTime() + 30000000))
-                        .signWith(secretKey).compact();
-            }
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userDTO.getUsername(),
+                        userDTO.getPassword()
+                )
+        );
+
+        // If we get here, the user is authenticated successfully
+        var user = userRepository.findByUsername(userDTO.getUsername())
+                .orElseThrow();
+
+        var jwtToken = jwtService.generateToken(user);
 
         // If code reaches here, the user is 100% valid.
-        return new AuthResponseDTO(jwt);
+        return new AuthResponseDTO(jwtToken);
     }
 }
