@@ -2,6 +2,7 @@ package com.ilnur.bookich.dtos;
 
 import com.ilnur.bookich.annotations.PasswordMatches;
 import com.ilnur.bookich.enums.District;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -27,6 +28,7 @@ public class UserRegistrationDTO {
     // Regex: At least one letter and one number
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$",
             message = "Password must contain letters and numbers")
+    @Transient // this annotation tells JPA, not to consider this field when it queries the database
     private String matchPassword;
 
     @NotBlank(message = "Please, enter your first name")

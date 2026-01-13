@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,8 +21,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public abstract class ExchangeRequestMapper {
 
-    private final BookRepository bookRepository;
-    private final UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Mapping(source="offeredBook.id", target = "offeredBookId")
     @Mapping(source="requestedBook.id", target = "requestedBookId")
@@ -36,6 +39,7 @@ public abstract class ExchangeRequestMapper {
     @Mapping(source = "receiverId", target = "receiver", qualifiedByName = "idToReceiver")
     public abstract ExchangeRequest toExchangeRequest(ExchangeRequestDTO dto);
 
+    // these methods map id to whole object
     @Named("idToBook")
     protected Book mapBook(Long id) {
         if(id == null) return null;

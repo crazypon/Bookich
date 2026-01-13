@@ -1,14 +1,20 @@
 package com.ilnur.bookich.config;
 
 
+import com.ilnur.bookich.filters.JWTTokenGeneratorFilter;
+import com.ilnur.bookich.filters.JWTTokenValidatorFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 
 /*
@@ -27,19 +33,24 @@ When malicious website pretends that you are the user
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationProvider provider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .csrf(csrf -> csrf.disable()) // we usually disable csrf for RestAPIs
+                .cors(cors -> cors.disable())
+                .sessionManagement(
+                        sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(
                 auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()) // this parameter is mandatory for basic authentication
-                .authenticationProvider(provider);
+//                .addFilterBefore(new JWTTokenGeneratorFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(), UsernamePasswordAuthenticationFilter.class);
+//                .httpBasic(Customizer.withDefaults()); // this parameter is mandatory for basic authentication
+
 
         return http.build();
     }
