@@ -33,48 +33,30 @@ public class AuthService {
      includes only final and @NonNull marked fields of a class
      AllArgsConstructor includes every field except static ones
      */
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
-    private final AuthenticationManager authenticationManager;
-    private final UserMapper userMapper;
-    private final Environment env;
-    private final JwtService jwtService;
-
-    public AuthResponseDTO register(UserRegistrationDTO userDTO) throws UserAlreadyExistsException {
-        if(userRepository.existsByUsername(userDTO.getUsername())) {
-            throw new UserAlreadyExistsException("User with this name already exists");
-        }
-
-        if (userRepository.existsByPhoneNumber(userDTO.getPhoneNumber())) {
-            throw new UserAlreadyExistsException("Phone number is already in use.");
-        }
-
-        // mapping user using MapStruct
-        User user = userMapper.toUser(userDTO);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        userRepository.save(user);
-
-        var jwtToken = jwtService.generateToken(user);
-
-        return new AuthResponseDTO(jwtToken);
-    }
-
-    public AuthResponseDTO login(UserLoginDTO userDTO) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userDTO.getUsername(),
-                        userDTO.getPassword()
-                )
-        );
-
-        // If we get here, the user is authenticated successfully
-        var user = userRepository.findByUsername(userDTO.getUsername())
-                .orElseThrow();
-
-        var jwtToken = jwtService.generateToken(user);
-
-        // If code reaches here, the user is 100% valid.
-        return new AuthResponseDTO(jwtToken);
-    }
+//    private final UserRepository userRepository;
+//    private final UserMapper userMapper;
+//    private final Environment env;
+//    private final JwtService jwtService;
+//
+//    public AuthResponseDTO register(UserRegistrationDTO userDTO) throws UserAlreadyExistsException {
+//        if(userRepository.existsByUsername(userDTO.getUsername())) {
+//            throw new UserAlreadyExistsException("User with this name already exists");
+//        }
+//
+//        if (userRepository.existsByPhoneNumber(userDTO.getPhoneNumber())) {
+//            throw new UserAlreadyExistsException("Phone number is already in use.");
+//        }
+//
+//
+//    }
+//
+//    public AuthResponseDTO login(UserLoginDTO userDTO) {
+//        authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        userDTO.getUsername(),
+//                        userDTO.getPassword()
+//                )
+//        );
+//
+//    }
 }

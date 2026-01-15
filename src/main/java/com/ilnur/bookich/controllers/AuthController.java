@@ -18,22 +18,22 @@ public class AuthController {
 
     private final AuthService authenticationService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> registerUser(@Valid @RequestBody UserRegistrationDTO user) {
-        AuthResponseDTO token = authenticationService.register(user); // this is just a placeholder for our future JWT token
-        return ResponseEntity.ok(token);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> loginUser(@Valid @RequestBody UserLoginDTO user) {
-        AuthResponseDTO token = authenticationService.login(user);
-        return ResponseEntity.ok(token);
-    }
-
-    @PostMapping("/apiLogin")
-    public ResponseEntity<AuthResponseDTO> apiLogin (@RequestBody UserLoginDTO loginRequest) {
-        AuthResponseDTO authResponse = authenticationService.login(loginRequest);
-        return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,authResponse.getToken())
-                .body(authResponse);
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthResponseDTO> registerUser(@Valid @RequestBody UserRegistrationDTO user) {
+//        AuthResponseDTO token = authenticationService.register(user); // this is just a placeholder for our future JWT token
+//        return ResponseEntity.ok(token);
+//    }
+//
+//    @PostMapping("/login")
+//    public ResponseEntity<AuthResponseDTO> loginUser(@Valid @RequestBody UserLoginDTO user) {
+//        AuthResponseDTO token = authenticationService.login(user);
+//        return ResponseEntity.ok(token);
+//    }
+//
+//    @PostMapping("/apiLogin")
+//    public ResponseEntity<AuthResponseDTO> apiLogin (@RequestBody UserLoginDTO loginRequest) {
+//        AuthResponseDTO authResponse = authenticationService.login(loginRequest);
+//        return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,authResponse.getToken())
+//                .body(authResponse);
+//    }
 }

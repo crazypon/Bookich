@@ -1,87 +1,53 @@
 package com.ilnur.bookich.config;
 
-
-import com.ilnur.bookich.filters.JWTTokenGeneratorFilter;
-import com.ilnur.bookich.filters.JWTTokenValidatorFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-
-/*
-CORS - stands for Cross Origin Resource Sharing
-Nowadays, application are built in two different parts backend and front end.
-With Front end we invoke API of our back end to get the data. And CORS does not allow us
-to share resources for origins that are different from us (like they have different hostname and different port). So,
-CORS is not a cyber-attack it is just constraint
-
-CSRF - stands for Cross Site Request Forgery
-When malicious website pretends that you are the user
- */
-
-//@Configuration
-//@EnableWebSecurity
-//@RequiredArgsConstructor
-//public class SecurityConfig {
-//
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-//        http
-//                .csrf(csrf -> csrf.disable()) // we usually disable csrf for RestAPIs
-//                .cors(cors -> cors.disable())
-//                .sessionManagement(
-//                        sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                )
-//                .authorizeHttpRequests(
-//                auth -> auth
-//                        .requestMatchers("/api/auth/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-////                .addFilterBefore(new JWTTokenGeneratorFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(new JWTTokenValidatorFilter(), UsernamePasswordAuthenticationFilter.class);
-////                .httpBasic(Customizer.withDefaults()); // this parameter is mandatory for basic authentication
-//
-//
-//        return http.build();
-//    }
-//}
-
-
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JWTTokenValidatorFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                );
 
         return http.build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // 1. Create a converter to extract the roles
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        // Tell Spring to look in the "roles" claim (matching your Auth Server)
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        // Add the "ROLE_" prefix so hasRole('ADMIN') works
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        // 2. Attach it to the main converter
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+
+        return jwtAuthenticationConverter;
     }
 }
