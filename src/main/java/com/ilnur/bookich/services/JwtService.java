@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/*
+This file is for JWT Authorization, didn't remove it, for review purposes
+ */
+
 @Service
 public class JwtService {
 

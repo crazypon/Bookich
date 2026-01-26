@@ -18,22 +18,3 @@ VALUES (
            'SHAYHANTAHUR'
        );
 
-INSERT INTO users (
-    public_id,
-    username,
-    password,
-    first_name,
-    last_name,
-    phone_number,
-    district
-)
-VALUES (
-           '111111',
-           'runli',
-           -- hash, generated using generator WebSite for password 'ilnur089'
-           '{noop}ilnur',
-           'ilnur',
-           'yamaletdinov',
-           '+998900000000',
-           'SHAYHANTAHUR'
-       );
