@@ -36,8 +36,7 @@ public class BookController {
     @GetMapping
     public ResponseEntity<Page<Book>> getAllBooks(@PageableDefault(size = 8, sort = "title") Pageable pageable) {
         Page<Book> books = bookService.getLibrary(pageable);
-        return ResponseEntity
-                .ok(books);
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping("/{id}")

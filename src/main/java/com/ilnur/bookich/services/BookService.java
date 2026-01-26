@@ -46,7 +46,9 @@ public class BookService {
 
     public Page<Book> getUsersBook(Pageable pageable) {
         String user = userContextService.getCurrentUser().getUsername();
-        return userRepository.findBooksByUsername(user, pageable);
+        // Please, pay attention to the name of this method OwnerUsername, that saves a lot of time, since
+        // entity contains only User owner, not String owner
+        return bookRepository.findBooksByOwnerUsername(user, pageable);
     }
 
     public void remove(long id) {

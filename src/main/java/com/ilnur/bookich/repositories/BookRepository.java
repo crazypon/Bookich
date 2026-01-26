@@ -11,6 +11,6 @@ import java.util.Set;
 
 
 public interface BookRepository extends JpaRepository<Book, Long> {
-    Set<Book> findBooksByOwner(User owner);
+    Page<Book> findBooksByOwnerUsername(String owner, Pageable pageable);
     Page<Book> findAll(Pageable pageable);
 }
