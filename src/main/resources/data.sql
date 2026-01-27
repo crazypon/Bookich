@@ -48,7 +48,7 @@ INSERT INTO books (
     condition,
     is_18_plus
 ) VALUES (
-             2,
+             1,
              'The Midnight Library',
              'Matt Haig',
              'FICTION', -- Assuming 'Fiction' exists in your genre_enum
@@ -56,3 +56,38 @@ INSERT INTO books (
              'USED_GOOD',
              FALSE
          );
+
+INSERT INTO books (
+    owner_id,
+    title,
+    author,
+    genre,
+    description,
+    condition,
+    is_18_plus
+) VALUES (
+             2,
+             'Rich Pepe, Poor Pepe',
+             'Gun West',
+             'FICTION', -- Assuming 'Fiction' exists in your genre_enum
+             'A novel about all the choices that go into a life well lived.',
+             'USED_GOOD',
+             FALSE
+         );
+
+
+INSERT INTO exchange_requests (
+    type,
+    status,
+    initiator_id,
+    receiver_id,
+    offered_book_id,
+    requested_book_id
+) VALUES (
+          'SWAP',
+          'PENDING',
+          2,
+          1,
+          2,
+          1
+    );

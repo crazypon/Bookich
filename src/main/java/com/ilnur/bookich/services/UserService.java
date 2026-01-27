@@ -25,6 +25,7 @@ public class UserService {
         User user = userContextService.getCurrentUser();
         // this method maps the fields which are not null to new ones
         userMapper.updateUserFromDto(userInfo, user);
+        userRepository.save(user);
     }
 
     public User getUserProfile(String userId) {

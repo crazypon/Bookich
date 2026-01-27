@@ -18,42 +18,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 @Mapper(componentModel = "spring")
-@RequiredArgsConstructor
-public abstract class ExchangeRequestMapper {
-
-    @Autowired
-    private BookRepository bookRepository;
-    @Autowired
-    private UserRepository userRepository;
-
+public interface ExchangeRequestMapper {
     @Mapping(source="offeredBook.id", target = "offeredBookId")
     @Mapping(source="requestedBook.id", target = "requestedBookId")
-    public abstract ExchangeResponseDTO toResponseDTO(ExchangeRequest request);
+    public ExchangeResponseDTO toResponseDTO(ExchangeRequest request);
 
     /*
     Mapping id and object
      */
 
-    @Mapping(source = "offeredBookId", target = "offeredBook", qualifiedByName = "idToBook")
-    @Mapping(source = "requestedBookId", target = "requestedBook", qualifiedByName = "idToBook")
-    @Mapping(source = "receiverId", target = "receiver", qualifiedByName = "idToReceiver")
-    public abstract ExchangeRequest toExchangeRequest(ExchangeRequestDTO dto);
+    @Mapping(target = "offeredBook", ignore = true)
+    @Mapping(target = "requestedBook",ignore = true)
+    @Mapping(target = "receiver", ignore = true)
+    public ExchangeRequest toExchangeRequest(ExchangeRequestDTO dto);
 
-    // these methods map id to whole object
-    @Named("idToBook")
-    protected Book mapBook(Long id) {
-        if(id == null) return null;
-        return bookRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Such Book")
-        );
-    }
 
-    @Named("idToReceiver")
-    protected User mapReceiver(Long id) {
-        if(id == null) return null;
-        return userRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Such User")
-        );
-    }
 
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.sound.midi.Receiver;
 import java.util.List;
 
 
@@ -52,12 +53,19 @@ public class ExchangeRequestService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Such Book to Exchange")
         );
 
+        Book requestedBook = bookRepository.findById(dto.getRequestedBookId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Such Book to Exchange")
+        );
+
         if(!offeredBook.getOwner().getId().equals(initiator.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the owner of offered book");
         }
 
         ExchangeRequest request = exchangeRequestMapper.toExchangeRequest(dto);
         request.setInitiator(userContextService.getCurrentUser());
+        request.setOfferedBook(offeredBook);
+        request.setRequestedBook(requestedBook);
+        request.setReceiver(receiver);
 
         exchangeRequestRepository.save(request);
 

@@ -21,7 +21,7 @@ public class ExchangeController {
     private final ExchangeRequestService exchangeRequestService;
 
     @PostMapping("/request")
-    public ResponseEntity<String> createRequest(@RequestBody ExchangeRequestDTO request) {
+    public ResponseEntity<String> createRequest(@Valid @RequestBody ExchangeRequestDTO request) {
         exchangeRequestService.createRequest(request);
         return ResponseEntity.ok("Exchange Request Created Successfully");
     }
