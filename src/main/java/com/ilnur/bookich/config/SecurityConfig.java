@@ -21,9 +21,14 @@ public class SecurityConfig {
 
         http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                /*
+                I don't need CSRF protection to set up, since future front end will send jwt token inside of
+                Authorization header every request, meaning no attacker's website can force the browser to
+                attach new header to the request
+                 */
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/books").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -37,7 +42,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        // 1. Create a converter to extract the roles
+        // converter to extract the roles
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         // Tell Spring to look in the "roles" claim (matching your Auth Server)
         grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
